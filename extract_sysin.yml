@@ -15,10 +15,10 @@
         src: "./fetched_racfcert_jcl.txt"
       register: jcl_content
 
-    - name: Extract and print SYSIN block
+    - name: Extract and print SYSTSIN block
       ansible.builtin.debug:
         msg:
-          - "SYSIN Input: {{ sysin_input }}"
+          - "SYSTSIN Input: {{ systsin_input }}"
 
     - name: Print out all gathered facts about the z/OS host.
       ansible.builtin.debug:
