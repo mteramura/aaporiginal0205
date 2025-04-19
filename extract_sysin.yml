@@ -1,4 +1,4 @@
-- name: Extract SYSIN input from RACFCERT JCL.
+ - name: Extract SYSIN input from RACFCERT JCL.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
