@@ -1,0 +1,35 @@
+- name: Extract SYSIN input from RACFCERT JCL
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Fetch JCL from target PDS
+      ibm.ibm_zos_core.zos_fetch:
+        src: "IBMUSER.JCL(RACFCERT)"  
+        dest: "./fetched_racfcert_jcl.txt"
+        is_binary: false
+      
+    - name: Slurp the fetched JCL into memory
+      ansible.builtin.slurp:
+        src: "./fetched_racfcert_jcl.txt"
+      register: jcl_content
+
+    - name: Extract and print SYSIN block
+      ansible.builtin.debug:
+        msg: |
+          {% set lines = jcl_content['content'] | b64decode().splitlines() %}
+          {% set sysin_lines = [] %}
+          {% set in_sysin = false %}
+          {% for line in lines %}
+            {% if line.startswith('//') and 'SYSIN' in line %}
+              {% set in_sysin = true %}
+              {% set _ = sysin_lines.append('--- SYSIN START ---') %}
+            {% elif in_sysin and line.startswith('//') %}
+              {% set _ = sysin_lines.append('--- SYSIN END ---') %}
+              {% set in_sysin = false %}
+            {% elif in_sysin %}
+              {% set _ = sysin_lines.append(line) %}
+            {% endif %}
+          {% endfor %}
+          {{ sysin_lines | join('\n') }}
