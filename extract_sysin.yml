@@ -17,19 +17,9 @@
 
     - name: Extract and print SYSIN block
       ansible.builtin.debug:
-        msg: |
-          {% set lines = jcl_content['content'] | b64decode().splitlines() %}
-          {% set sysin_lines = [] %}
-          {% set in_sysin = false %}
-          {% for line in lines %}
-            {% if line.startswith('//') and 'SYSIN' in line %}
-              {% set in_sysin = true %}
-              {% set _ = sysin_lines.append('--- SYSIN START ---') %}
-            {% elif in_sysin and line.startswith('//') %}
-              {% set _ = sysin_lines.append('--- SYSIN END ---') %}
-              {% set in_sysin = false %}
-            {% elif in_sysin %}
-              {% set _ = sysin_lines.append(line) %}
-            {% endif %}
-          {% endfor %}
-          {{ sysin_lines | join('\n') }}
+        msg:
+          - "SYSIN Input: {{ sysin_input }}"
+
+    - name: Print out all gathered facts about the z/OS host.
+      ansible.builtin.debug:
+        var: ansible_facts
